@@ -4,21 +4,19 @@ Maven-based Java test automation project for Flexilant. It includes API contract
 
 ## Prerequisites
 
-- Java 11+
+- Java 17+
 - Maven 3.6+
 
 ## Tech stack
 
-
-| Library       | Purpose                                                           |
-| ------------- | ----------------------------------------------------------------- |
-| TestNG        | Test framework                                                    |
-| REST Assured  | API testing and JSON schema validation                            |
-| OpenCSV       | CSV file handling                                                 |
-| Allure TestNG | Test reporting                                                    |
-| Logback       | Logging (rolling files under `logs/`, 10 MB max, 5-day retention) |
-| Lombok        | Boilerplate reduction                                             |
-
+| Library       | Purpose                                                                           |
+| ------------- | --------------------------------------------------------------------------------- |
+| TestNG        | Test framework and suite orchestration via [testng.xml](src/main/resources/testng.xml) |
+| REST Assured  | API testing and JSON schema validation                                            |
+| OpenCSV       | CSV file handling                                                                 |
+| Allure TestNG | Test reporting via [AllureListener](src/main/java/com/flexilant/AllureListener.java) |
+| Logback       | Logging to console and rolling files under `logs/` (10 MB max, 5-day retention)   |
+| Lombok        | Boilerplate reduction (`@Slf4j` for logging)                                      |
 
 ## Project structure
 
@@ -26,17 +24,21 @@ Maven-based Java test automation project for Flexilant. It includes API contract
 task_for_flexilant_works/
 ├── src/
 │   ├── main/java/com/flexilant/
-│   │   ├── constants/          # Shared constants
-│   │   ├── exceptions/         # Custom runtime exceptions
-│   │   └── utils/              # File and test helpers
+│   │   ├── AllureListener.java   # Custom Allure TestNG listener
+│   │   ├── constants/            # Shared constants
+│   │   ├── exceptions/           # Custom runtime exceptions
+│   │   └── utils/                # File and test helpers
 │   ├── main/resources/
 │   │   ├── logback.xml
-│   │   └── testng.xml
+│   │   └── testng.xml            # TestNG suite (used by Maven Surefire)
 │   └── test/java/com/flexilant/
+│       ├── AllureListener.java   # Custom Allure TestNG listener
 │       ├── CsvFileComparisonTest.java
 │       ├── OrderDetailsVerificationTest.java
 │       └── resources/json-schema/schema.json
-├── test-data/                  # CSV files for comparison tests
+├── test-data/                    # CSV files for comparison tests
+├── allure-results/               # Allure report data (created on test run)
+├── logs/                         # Runtime log output (created on first run)
 └── pom.xml
 ```
 
@@ -46,7 +48,6 @@ task_for_flexilant_works/
 
 API tests for the orders endpoint using REST Assured. Configure the base URI in `setUp()` before running.
 
-
 | Priority | Method                             | Description                                          |
 | -------- | ---------------------------------- | ---------------------------------------------------- |
 | 1        | `schemaValidation`                 | Validates response against `schema.json`             |
@@ -55,27 +56,26 @@ API tests for the orders endpoint using REST Assured. Configure the base URI in 
 | 4        | `getOrderInvalidId`                | Asserts 400 for invalid `order_id` format            |
 | 5        | `validateResponseTime`             | Asserts response time is under 2 seconds             |
 
-
 **Endpoint:** `GET /api/orders/{order_id}`
 
-**Schema location:** `src/test/java/resources/json-schema/schema.json`
+**Schema location:** [schema.json](src/test/java/resources/json-schema/schema.json)
+
+**Configuration:** HTTP socket and connection timeouts are set to 60 seconds in `timeoutConfig()`. `ErrorLoggingFilter` logs failed REST Assured requests to the application logger.
 
 ### CsvFileComparisonTest
 
 Validates CSV header comparison between expected and actual order files. Covers header extraction, common columns, relative ordering, and error handling for missing or empty files.
 
-See [CsvFileComparisonTest.md](CsvFileComparisonTest.md) for full details, sample data, and expected behavior.
-
-
 | Priority | Method                     | Description                                                 |
 | -------- | -------------------------- | ----------------------------------------------------------- |
-| 1        | `printBothHeader`          | Prints headers from both CSV files                          |
-| 2        | `commonHeaders`            | Prints shared column names                                  |
-| 3        | `headerSequence`           | Checks if any shared header appears at the same index       |
-| 4        | `fileWithIdenticalHeaders` | Confirms identical headers when reading the same file twice |
-| 5        | `missingFilePaths`         | Validates error when file path does not exist               |
-| 6        | `emptyFileHandling`        | Validates error when file is empty                          |
-
+| 1        | `printActualHeader`        | Logs headers from the actual CSV file                       |
+| 2        | `printExpectedHeader`      | Logs headers from the expected CSV file                     |
+| 3        | `printBothHeader`          | Logs headers from both CSV files                            |
+| 4        | `commonHeaders`            | Logs shared column names                                    |
+| 5        | `headerSequence`           | Checks if any shared header appears at the same index       |
+| 6        | `fileWithIdenticalHeaders` | Confirms identical headers when reading the same file twice |
+| 7        | `missingFilePaths`         | Validates error when file path does not exist               |
+| 8        | `emptyFileHandling`        | Validates error when file is empty                          |
 
 **Test data:** `test-data/expected_orders.csv`, `test-data/actual_orders.csv`, `test-data/test_empty_file.csv`
 
@@ -84,30 +84,29 @@ See [CsvFileComparisonTest.md](CsvFileComparisonTest.md) for full details, sampl
 From the project root:
 
 ```bash
-# Run all tests
+# Run the TestNG suite (configured in testng.xml)
 mvn test
 
-# Run a specific test class
-mvn test -Dtest=OrderDetailsVerificationTest
-mvn test -Dtest=CsvFileComparisonTest
-
-# Run a single test method
-mvn test -Dtest=CsvFileComparisonTest#printBothHeader
+# Use a different suite file
+mvn test -DsuiteXmlFile=path/to/custom-suite.xml
 ```
 
-Tests can also be run from an IDE by executing the TestNG classes directly.
+Tests can also be run from an IDE by executing the TestNG suite or individual test classes directly.
 
-> **Note:** `OrderDetailsVerificationTest` requires a reachable API. Update the base URI in `OrderDetailsVerificationTest#setUp` before running those tests.
+> **Note:** `OrderDetailsVerificationTest` requires a reachable API. Update the base URI in `OrderDetailsVerificationTest#setUp` and enable the API test block in [testng.xml](src/main/resources/testng.xml) before running those tests.
 
 ## Logging
 
-Logs are written to `logs/application.log` with daily rolling and a 10 MB size limit. Archived logs are retained for 5 days. Configuration is in `src/main/resources/logback.xml`.
+Logs are written to `logs/application.log` with daily rolling and a 10 MB size limit. Archived logs are retained for 5 days. Configuration is in [logback.xml](src/main/resources/logback.xml).
 
 ## Reporting
 
-Allure results are generated under `allure-results/` when tests run with Allure enabled. Serve the report with the Allure CLI if installed:
+Allure results are written to `target/allure-results/` when tests run. Serve or generate the report with:
 
 ```bash
-allure serve allure-results
+mvn allure:serve
+# or
+allure serve target/allure-results
 ```
 
+Failed and skipped tests include **Test Metadata** and **Failure Stack Trace** attachments from [AllureListener](src/test/java/com/flexilant/AllureListener.java). API tests additionally include request/response details from `AllureRestAssured`.

@@ -1,96 +1,278 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+
+
   <modelVersion>4.0.0</modelVersion>
 
+
+
   <groupId>com.flexilant</groupId>
+
   <artifactId>TaskForFlexilantWorks</artifactId>
-  <version>1.0-SNAPSHOT</version>
+
+  <version>1.0.0</version>
+
   <packaging>jar</packaging>
 
+
+
   <name>TaskForFlexilantWorks</name>
-  <url>http://maven.apache.org</url>
+
+  <description>Test automation framework for Flexilant API and CSV validation</description>
+
+
 
   <properties>
+
+    <maven.compiler.release>17</maven.compiler.release>
+
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+    <maven.compiler.plugin.version>3.14.0</maven.compiler.plugin.version>
+
+    <maven.surefire.version>3.5.3</maven.surefire.version>
+
+    <maven.enforcer.version>3.5.0</maven.enforcer.version>
+
+    <allure.maven.version>2.15.2</allure.maven.version>
+
+    <testng.version>7.12.0</testng.version>
+
+    <restassured.version>6.0.0</restassured.version>
+
+    <allure.version>2.35.3</allure.version>
+
+    <lombok.version>1.18.46</lombok.version>
+
+    <logback.version>1.5.37</logback.version>
+
+    <slf4j.version>2.0.17</slf4j.version>
+
+    <commons.lang3.version>3.17.0</commons.lang3.version>
+
+    <suiteXmlFile>src/main/resources/testng.xml</suiteXmlFile>
+
+    <env>local</env>
+
+    <argLine></argLine>
+
+    <allure.results.directory>${project.build.directory}/allure-results</allure.results.directory>
+
   </properties>
+
+
 
   <dependencies>
     <dependency>
-      <groupId>io.rest-assured</groupId>
-      <artifactId>rest-assured</artifactId>
-      <version>6.0.0</version>
-    </dependency>
-    <dependency>
-      <groupId>io.rest-assured</groupId>
-      <artifactId>json-schema-validator</artifactId>
-      <version>6.0.0</version>
-      <scope>compile</scope>
-    </dependency>
-    <dependency>
-      <groupId>io.qameta.allure</groupId>
-      <artifactId>allure-rest-assured</artifactId>
-      <version>2.35.3</version>
-      <scope>compile</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.projectlombok</groupId>
-      <artifactId>lombok</artifactId>
-      <version>1.18.46</version>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+      <version>${slf4j.version}</version>
     </dependency>
     <dependency>
       <groupId>ch.qos.logback</groupId>
       <artifactId>logback-classic</artifactId>
-      <version>1.5.37</version>
+      <version>${logback.version}</version>
     </dependency>
     <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-api</artifactId>
-      <version>2.0.17</version>
-      <scope>compile</scope>
+      <groupId>org.projectlombok</groupId>
+      <artifactId>lombok</artifactId>
+      <version>${lombok.version}</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-lang3</artifactId>
+      <version>${commons.lang3.version}</version>
     </dependency>
     <dependency>
       <groupId>org.testng</groupId>
       <artifactId>testng</artifactId>
-      <version>7.12.0</version>
-      <scope>test</scope>
+      <version>${testng.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>io.rest-assured</groupId>
+      <artifactId>rest-assured</artifactId>
+      <version>${restassured.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>io.rest-assured</groupId>
+      <artifactId>json-schema-validator</artifactId>
+      <version>${restassured.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>io.qameta.allure</groupId>
+      <artifactId>allure-rest-assured</artifactId>
+      <version>${allure.version}</version>
     </dependency>
     <dependency>
       <groupId>io.qameta.allure</groupId>
       <artifactId>allure-testng</artifactId>
-      <version>2.35.3</version>
-      <scope>compile</scope>
+      <version>${allure.version}</version>
     </dependency>
     <dependency>
       <groupId>io.qameta.allure</groupId>
       <artifactId>allure-attachments</artifactId>
-      <version>2.35.3</version>
-      <scope>compile</scope>
+      <version>${allure.version}</version>
+      <scope>test</scope>
     </dependency>
-    <dependency>
-      <groupId>net.datafaker</groupId>
-      <artifactId>datafaker</artifactId>
-      <version>2.7.0</version>
-      <scope>compile</scope>
-    </dependency>
-    <dependency>
-      <groupId>com.opencsv</groupId>
-      <artifactId>opencsv</artifactId>
-      <version>5.12.0</version>
-      <scope>compile</scope>
-    </dependency>
+
   </dependencies>
+
+
+
   <build>
+
     <plugins>
+
       <plugin>
+
         <groupId>org.apache.maven.plugins</groupId>
+
         <artifactId>maven-compiler-plugin</artifactId>
+
+        <version>${maven.compiler.plugin.version}</version>
+
         <configuration>
-          <source>11</source>
-          <target>11</target>
+
+          <release>${maven.compiler.release}</release>
+
+          <encoding>${project.build.sourceEncoding}</encoding>
+
         </configuration>
+
       </plugin>
+
+
+
+      <plugin>
+
+        <groupId>org.apache.maven.plugins</groupId>
+
+        <artifactId>maven-surefire-plugin</artifactId>
+
+        <version>${maven.surefire.version}</version>
+
+        <configuration>
+
+          <argLine>${argLine}</argLine>
+
+          <suiteXmlFiles>
+
+            <suiteXmlFile>${suiteXmlFile}</suiteXmlFile>
+
+          </suiteXmlFiles>
+
+          <forkCount>1</forkCount>
+
+          <reuseForks>true</reuseForks>
+
+          <testFailureIgnore>false</testFailureIgnore>
+
+          <systemPropertyVariables>
+
+            <env>${env}</env>
+
+            <allure.results.directory>${allure.results.directory}</allure.results.directory>
+
+          </systemPropertyVariables>
+
+        </configuration>
+
+      </plugin>
+
+
+
+      <plugin>
+
+        <groupId>io.qameta.allure</groupId>
+
+        <artifactId>allure-maven</artifactId>
+
+        <version>${allure.maven.version}</version>
+
+        <configuration>
+
+          <reportVersion>${allure.version}</reportVersion>
+
+          <resultsDirectory>${allure.results.directory}</resultsDirectory>
+
+        </configuration>
+
+      </plugin>
+
+
+
+      <plugin>
+
+        <groupId>org.apache.maven.plugins</groupId>
+
+        <artifactId>maven-enforcer-plugin</artifactId>
+
+        <version>${maven.enforcer.version}</version>
+
+        <executions>
+
+          <execution>
+
+            <id>enforce</id>
+
+            <goals>
+
+              <goal>enforce</goal>
+
+            </goals>
+
+            <configuration>
+
+              <rules>
+
+                <requireJavaVersion>
+
+                  <version>[17,)</version>
+
+                </requireJavaVersion>
+
+                <requireMavenVersion>
+
+                  <version>[3.6,)</version>
+
+                </requireMavenVersion>
+
+              </rules>
+
+            </configuration>
+
+          </execution>
+
+        </executions>
+
+      </plugin>
+
     </plugins>
+
   </build>
 
 
+
+  <profiles>
+
+    <profile>
+
+      <id>qa</id>
+
+      <properties>
+
+        <env>qa</env>
+
+      </properties>
+
+    </profile>
+
+  </profiles>
+
 </project>
+
