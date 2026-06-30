@@ -66,16 +66,18 @@ API tests for the orders endpoint using REST Assured. Configure the base URI in 
 
 Validates CSV header comparison between expected and actual order files. Covers header extraction, common columns, relative ordering, and error handling for missing or empty files.
 
-| Priority | Method                     | Description                                                 |
-| -------- | -------------------------- | ----------------------------------------------------------- |
-| 1        | `printActualHeader`        | Logs headers from the actual CSV file                       |
-| 2        | `printExpectedHeader`      | Logs headers from the expected CSV file                     |
-| 3        | `printBothHeader`          | Logs headers from both CSV files                            |
-| 4        | `commonHeaders`            | Logs shared column names                                    |
-| 5        | `headerSequence`           | Checks if any shared header appears at the same index       |
-| 6        | `fileWithIdenticalHeaders` | Confirms identical headers when reading the same file twice |
-| 7        | `missingFilePaths`         | Validates error when file path does not exist               |
-| 8        | `emptyFileHandling`        | Validates error when file is empty                          |
+| Priority | Method                        | Description                                                                            |
+|----------|-------------------------------|----------------------------------------------------------------------------------------|
+| 1        | `printActualHeader`           | Logs headers from the actual CSV file                                                  |
+| 2        | `printExpectedHeader`         | Logs headers from the expected CSV file                                                |
+| 3        | `printBothHeader`             | Logs headers from both CSV files                                                       |
+| 4        | `commonHeaders`               | Logs shared column names                                                               |
+| 5        | `headerSequence`              | Checks if any shared header appears at the same index                                  |
+| 6        | `fileWithIdenticalHeaders`    | Confirms identical headers when reading the same file twice                            |
+| 7        | `missingFilePaths`            | Validates error when file path does not exist                                          |
+| 8        | `emptyFileHandling`           | Validates error when file is empty                                                     |
+| 9        | `sameHeaderDifferentSequence` | Validate If the headers are the same but in a different order, it should return equal. |
+| 10       | `invalidHeaders`              | validate File with Invalid headers                                                     |
 
 **Test data:** `test-data/expected_orders.csv`, `test-data/actual_orders.csv`, `test-data/test_empty_file.csv`
 
