@@ -3,10 +3,12 @@ package com.flexilant;
 import com.flexilant.utils.FileHandlingUtils;
 import com.flexilant.utils.TestUtils;
 import lombok.extern.slf4j.Slf4j;
+import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -19,6 +21,7 @@ public class CsvFileComparisonTest {
             Paths.get("test-data", "actual_orders.csv"));
 
       List<String> actualHeader = res.get("actualHeader");
+      log.info("Only in actual_orders.csv: ");
       actualHeader.forEach(log::info);
    }
 
@@ -28,6 +31,7 @@ public class CsvFileComparisonTest {
             Paths.get("test-data", "actual_orders.csv"));
 
       List<String> expectedHeader = res.get("expectedHeader");
+      log.info("Only in expected_orders.csv: ");
       expectedHeader.forEach(log::info);
    }
 
@@ -51,6 +55,7 @@ public class CsvFileComparisonTest {
       List<String> actualHeader = res.get("actualHeader");
 
       expectedHeader.retainAll(actualHeader);
+      log.info("Common headers: ");
       expectedHeader.forEach(log::info);
    }
 
@@ -68,24 +73,49 @@ public class CsvFileComparisonTest {
    @Test(priority = 6, description = "Validate two files with same headers")
    public void fileWithIdenticalHeaders() {
       Path path = Paths.get("test-data", "expected_orders.csv");
-      String fileOne = FileHandlingUtils.readCsvFiles(path);
-      String fileTwo = FileHandlingUtils.readCsvFiles(path);
+      String fileOne = FileHandlingUtils.readCsvFilesHeaders(path);
+      String fileTwo = FileHandlingUtils.readCsvFilesHeaders(path);
 
       if (fileOne.equals(fileTwo)) log.info("Two files have Identical header");
+      else Assert.fail("Files are not identical");
    }
 
 
    @Test(priority = 7, description = "Validate when Missing/Invalid file path or File doesn't exist, throw error message")
    public void missingFilePaths() {
       Path path = Paths.get("test", "expected.csv");
-      FileHandlingUtils.readCsvFiles(path);
+      FileHandlingUtils.readCsvFilesHeaders(path);
    }
 
    @Test(priority = 8, description = "Validate when files are empty, error message should be shown")
    public void emptyFileHandling() {
       Path path = Paths.get("test-data", "test_empty_file.csv");
-      FileHandlingUtils.readCsvFiles(path);
+      FileHandlingUtils.readCsvFilesHeaders(path);
    }
 
+   @Test(priority = 9, description = "Validate If the headers are the same but in a different order, it should return equal.")
+   public void sameHeaderDifferentSequence(){
+      Path jumbledPath = Paths.get("test-data", "expected_orders_jumbled.csv");
+      Path path = Paths.get("test-data", "expected_orders.csv");
+
+      String jumbledHeader = FileHandlingUtils.readCsvFilesHeaders(jumbledPath);
+      String header = FileHandlingUtils.readCsvFilesHeaders(path);
+
+      String[] jumbledHeaderArray = jumbledHeader.split(",");
+      String[] headerArray = header.split(",");
+
+      Arrays.sort(jumbledHeaderArray);
+      Arrays.sort(headerArray);
+
+      boolean equals = Arrays.equals(jumbledHeaderArray, headerArray);
+      Assert.assertTrue(equals,"If the headers are the same but in a different order, it should return true.");
+   }
+
+   @Test(priority = 10, description = "validate File with Invalid headers")
+   public void invalidHeaders(){
+      Path invalidHeaderPath = Paths.get("test-data", "expected_Invalid_header_orders.csv");
+      String headerFromFile = FileHandlingUtils.readCsvFilesHeaders(invalidHeaderPath);
+      TestUtils.extractToList(headerFromFile);
+   }
 
 }

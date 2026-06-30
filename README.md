@@ -110,3 +110,13 @@ allure serve target/allure-results
 ```
 
 Failed and skipped tests include **Test Metadata** and **Failure Stack Trace** attachments from [AllureListener](src/test/java/com/flexilant/AllureListener.java). API tests additionally include request/response details from `AllureRestAssured`.
+
+**Personal Note** My SQL proficiency is currently at a basic to intermediate level. While working on SQL-related tasks, I occasionally rely on resources such as AI-assisted tools and Stack Overflow to validate approaches, explore alternative solutions, and enhance my understanding.
+If the role requires SQL as a primary skill, I am confident in my ability to learn quickly, adapt to the required level of proficiency, and continuously improve through hands-on experience. I’m committed to continuously developing my technical skills.
+
+**By submitting this exercise, I confirm that:**
+1. I have followed the AI usage rules.
+2. If I used AI, I have included the full relevant AI transcript or equivalent usage record.
+3. I understand the submitted solution.
+4. I am able to explain, modify, and debug the solution during the interview.
+5. I understand that failure to disclose AI use, or inability to explain the submitted work, may result in rejection.

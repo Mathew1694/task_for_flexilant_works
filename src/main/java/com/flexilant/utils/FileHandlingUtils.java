@@ -15,11 +15,11 @@ public class FileHandlingUtils {
    private FileHandlingUtils() {
    }
 
-   public static String readCsvFiles(Path path) {
+   public static String readCsvFilesHeaders(Path path) {
       try (BufferedReader br = new BufferedReader(new FileReader(path.toFile()))) {
          String line = br.readLine();
-         if (line != null) return line;
          if (line == null) throw new ValueNotFoundExceptions("Empty file, No contents present in file.");
+         else return line;
       } catch (FileNotFoundException er) {
          throw new ValueNotFoundExceptions("File not found in the specified folder path.");
       }catch (IOException e){
@@ -28,6 +28,5 @@ public class FileHandlingUtils {
       }
       return null;
    }
-
 
 }

@@ -1,0 +1,83 @@
+TEST CASE 1
+Test Name: Validate Order API Response Schema
+Input: Json schema file
+Method: GET
+Endpoint: /api/orders/{order_id}
+Path Param: order_id = ORD-1001
+
+Expected Result: response schema matches the provided json schema structure
+
+Status code: 200
+Response body matches JSON schema defined in schema.json
+
+Why this test is useful:
+Detects breaking changes in response structure early and validates integration stability.
+---------------------------
+TEST CASE 2
+Test Name: Validate Order Details for Valid Order ID
+
+Input: order_id
+Method: GET
+Endpoint: /api/orders/{order_id}
+Path Param: order_id = ORD-1001
+
+Expected Result:
+----------------------------
+Status code: 200
+order_id equals ORD-1001
+customer_id is not null
+amount is not null
+currency equals GBP
+status equals paid
+created_at is not null
+
+Why this test is useful:
+Confirms correct business logic for valid orders and ensures all required fields are returned with correct data.
+----------------------------
+TEST CASE 3
+Test Name: Validate 404 Response for Invalid Order ID
+
+Input: order_id
+Method: GET
+Endpoint: /api/orders/{order_id}
+Path Param: order_id = ORD-9999
+
+Expected Result:
+
+Status code: 404
+error equals Order not found
+
+Why this test is useful:
+Validates proper handling of non-existent resources and ensures correct HTTP status usage for missing data.
+----------------------------
+TEST CASE 4
+Test Name: Validate 400 Response for Invalid Order ID Format
+
+Input:
+Method: GET
+Endpoint: /api/orders/{order_id}
+Path Param: order_id = 458334
+
+Expected Result:
+
+Status code: 400
+error equals Invalid order_id format
+
+Why this test is useful:
+Ensures input validation is enforced and prevents invalid request formats from being processed by backend.
+----------------------------
+TEST CASE 5
+Test Name: Validate Order API Response Time Under SLA
+
+Input:
+Method: GET
+Endpoint: /api/orders/{order_id}
+Path Param: order_id = ORD-1001
+
+Expected Result:
+
+Status code: 200
+Response time less than 2000 ms
+
+Why this test is useful:
+Ensures API performance meets Service level agreement(SLA) requirements and helps detect performance degradation early.

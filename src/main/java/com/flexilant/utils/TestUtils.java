@@ -16,24 +16,15 @@ public class TestUtils {
    }
 
    public static Map<String, List<String>> headerComparison(Path expected, Path actual) {
-      String expectedHeader = StringUtils.deleteWhitespace(FileHandlingUtils.readCsvFiles(expected));
-      String actualHeader = StringUtils.deleteWhitespace(FileHandlingUtils.readCsvFiles(actual));
+      String expectedHeader = StringUtils.deleteWhitespace(FileHandlingUtils.readCsvFilesHeaders(expected));
+      String actualHeader = StringUtils.deleteWhitespace(FileHandlingUtils.readCsvFilesHeaders(actual));
 
       if (isNullOrBlank(expectedHeader)|| isNullOrBlank(actualHeader))
          throw new ValueNotFoundExceptions("Empty Files or No Values present.");
 
-      String[] split = expectedHeader.split(",");
-      List<String> expectedHeaderList = Arrays.stream(split)
-            .map(String::trim)
-            .collect(Collectors.toCollection(() -> new LinkedList<String>()));
-
-      String[] split1 = actualHeader.split(",");
-      List<String> actualHeaderList = Arrays.stream(split1)
-            .map(String::trim)
-            .collect(Collectors.toCollection(() -> new LinkedList<String>()));
-
+      List<String> expectedHeaderList = extractToList(expectedHeader);
+      List<String> actualHeaderList = extractToList(actualHeader);
       return Map.of("expectedHeader", expectedHeaderList, "actualHeader", actualHeaderList);
-
    }
 
    public static boolean isNullOrBlank(String s) {
@@ -50,5 +41,17 @@ public class TestUtils {
       return false;
    }
 
+   public static List<String> extractToList(String s){
+      if(isNullOrBlank(s))throw new IllegalArgumentException("Input cannot be null or Empty");
+      String[] split = s.split(",");
+      return Arrays.stream(split)
+            .map(String::trim)
+            .map(x-> {
+               String sanitized = x.replaceAll("[^a-zA-Z]", "");
+               if(sanitized.isBlank()) throw new IllegalArgumentException("Sanitized header is either empty or not valid.");
+               return sanitized;
+            })
+            .collect(Collectors.toCollection(() -> new LinkedList<String>()));
+   }
 
 }
